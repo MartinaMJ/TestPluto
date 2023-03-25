@@ -7,40 +7,68 @@ using InteractiveUtils
 # ╔═╡ afef820a-43b1-4cac-bce4-fda7956e918f
 using LinearAlgebra, PlutoUI
 
+# ╔═╡ 040f212e-b78a-4b31-9019-0d26f2653de8
+function permut(A::Matrix{Float64}, coluna::Int64, quantidadeLinhas::Int64, quantidadeColunas::Int64)
+		# As linhas a serem percorridas são aquelas cujos ínidices são superiores à coluna em análise.
+		linhasPercorridas = range(coluna, quantidadeLinhas)
+		#A lista numeroColunas é a lista usada no laço de repetição que permuta as linhas. 
+		numeroColunas = range(1, quantidadeColunas)
+		#A variável abaixo é o elemento da diagonal na coluna em análise. O laço de repetição abaixo compara este número com todos os número que estão abaixo dele para ver qual é o maior.
+		elemDiag = A[coluna, coluna]
+		for linha in linhasPercorridas
+			possivelDivisor = A[linha, coluna]
+			if elemDiag < possivelDivisor
+				# O laço de repetição abaixo troca os elementos da linha com o mesmo índice da coluna (uma vez que essa contém o elemento da diagonal) pelos elementos da linha em que foi observado o elemento maior que o elemento da diagonal
+				for counter in numeroColunas
+					A[coluna, counter], A[linha, counter] = A[linha, counter], A[coluna, counter]
+				end
+			end
+		end
+	return A
+end
+
 # ╔═╡ e844595b-56d4-410e-b193-30e0c353ad64
-function gauss(A::Matrix{Int64})
+function gauss(A::Matrix{Float64})
 		quantidadeLinhas = size(A,1)
 		quantidadeColunas = size(A,2)
+		#A variável linhaInicial define a linha do primeiro número a ser eliminado.
 		linhaInicial = 2
-		linhas = range(linhaInicial,quantidadeLinhas)
+		#A lista abaixo contém indices que representam cada uma das linhas da matriz, a partir da segunda.
+		linhas = range(linhaInicial, quantidadeLinhas)
+		#O primeiro laço de repetição define as colunas a serem percorridas. A última coluna que terá um elemento a ser eliminado é a penúltima da matriz.
 		for coluna in range(1, quantidadeColunas - 1)
+			# Será passada a matriz, a coluna em análise, a quantidade de colunas e linhas da matriz para a função de permutação. 
+			permut(A, coluna, quantidadeLinhas, quantidadeColunas)
 			for linha in linhas
-				divisor = A[coluna,coluna]
+				#Define-se o divisor do pivô
+				divisor = A[coluna, coluna]
+				#Por definição a matriz identidade deve ser quadrada e deve ter a quantidade de colunas igual à quantidade de linhas da matriz que multiplica para que a multiplicação seja possível
 				I = zeros(quantidadeLinhas, quantidadeLinhas)
+				# Laço para formar a matriz identidade
 				for contador in range(1, quantidadeLinhas)
 					I[contador, contador] = 1
-					if divisor == 0
-						divisor = A[coluna+1,coluna]
-					end
 				end
+				# Definindo o pivô e multiplicando
 				I[linha, coluna] = -A[linha, coluna]/divisor
 				A = I*A
-				linhas = [linhaInicial + 1, quantidadeLinhas]
 			end
 		end
 		return A
 	end
 
 # ╔═╡ 30ec62ec-1c90-4875-ae5e-01ef0723f883
-A = [2 3 4 3
-	1 0 7 5	
-	0 2 8 9]
+ B = [2 3
+	4 5]
 
-# ╔═╡ cceaeaa4-6661-447b-b575-ca18d49fb37f
-begin
+# ╔═╡ 56d39166-abbf-4c50-a77f-8255f55f53a6
+#Convertendo de Int para Float e verificando os elementos
+try
+	A = convert(Matrix{Float64}, B)
 	with_terminal() do
-		gauss(A)
+	gauss(A)
 	end
+catch
+	println("Algum elemento da matriz inserida contém erros")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -311,8 +339,9 @@ version = "17.4.0+0"
 
 # ╔═╡ Cell order:
 # ╠═afef820a-43b1-4cac-bce4-fda7956e918f
-# ╟─e844595b-56d4-410e-b193-30e0c353ad64
+# ╠═040f212e-b78a-4b31-9019-0d26f2653de8
+# ╠═e844595b-56d4-410e-b193-30e0c353ad64
 # ╠═30ec62ec-1c90-4875-ae5e-01ef0723f883
-# ╟─cceaeaa4-6661-447b-b575-ca18d49fb37f
+# ╠═56d39166-abbf-4c50-a77f-8255f55f53a6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
